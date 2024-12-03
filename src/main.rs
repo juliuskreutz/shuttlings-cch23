@@ -12,8 +12,9 @@ mod day14;
 mod day15;
 mod day18;
 mod day19;
+mod day20;
 
-use actix_web::web::{Data, ServiceConfig};
+use actix_web::web;
 use shuttle_actix_web::ShuttleActixWeb;
 use sqlx::PgPool;
 
@@ -22,8 +23,8 @@ type ShuttleResult<T> = Result<T, Box<dyn std::error::Error>>;
 #[shuttle_runtime::main]
 async fn main(
     #[shuttle_shared_db::Postgres] pool: PgPool,
-) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
-    let config = move |cfg: &mut ServiceConfig| {
+) -> ShuttleActixWeb<impl FnOnce(&mut web::ServiceConfig) + Send + Clone + 'static> {
+    let config = move |cfg: &mut web::ServiceConfig| {
         cfg.configure(day00::configure)
             .configure(day01::configure)
             .configure(day04::configure)
@@ -38,7 +39,9 @@ async fn main(
             .configure(day15::configure)
             .configure(day18::configure)
             .configure(day19::configure)
-            .app_data(Data::new(pool.clone()));
+            .configure(day20::configure)
+            .app_data(web::PayloadConfig::new(5 * 1024 * 1024))
+            .app_data(web::Data::new(pool.clone()));
     };
 
     Ok(config.into())
