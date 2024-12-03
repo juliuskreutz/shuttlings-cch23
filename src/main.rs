@@ -11,6 +11,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day18;
+mod day19;
 
 use actix_web::web::{Data, ServiceConfig};
 use shuttle_actix_web::ShuttleActixWeb;
@@ -36,6 +37,7 @@ async fn main(
             .configure(day14::configure)
             .configure(day15::configure)
             .configure(day18::configure)
+            .configure(day19::configure)
             .app_data(Data::new(pool.clone()));
     };
 
