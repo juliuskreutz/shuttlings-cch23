@@ -5,6 +5,7 @@ use actix_web::{
 };
 use git2::{build::CheckoutBuilder, BranchType};
 use tar::Archive;
+use walkdir::WalkDir;
 
 use crate::ShuttleResult;
 
@@ -38,29 +39,31 @@ async fn cookie(bytes: Bytes) -> ShuttleResult<impl Responder> {
 
     let repository = git2::Repository::open(&dir)?;
     let branch = repository.find_branch("christmas", BranchType::Local)?;
-    let mut current_commit = Some(branch.get().peel_to_commit()?);
 
-    while let Some(commit) = current_commit {
+    let mut revwalk = repository.revwalk()?;
+    revwalk.push(branch.get().target().unwrap())?;
+
+    for oid in revwalk.flatten() {
+        let commit = repository.find_commit(oid)?;
+
         let mut checkout_builder = CheckoutBuilder::new();
         checkout_builder.force();
         repository.checkout_tree(commit.as_object(), Some(&mut checkout_builder))?;
 
-        for entry in std::fs::read_dir(&dir)?.flatten() {
-            let path = entry.path();
+        for entry in WalkDir::new(&dir)
+            .into_iter()
+            .flatten()
+            .filter(|s| s.file_name().to_str() == Some("santa.txt"))
+        {
+            let content = std::fs::read_to_string(entry.path())?;
 
-            if path.file_name().and_then(|s| s.to_str()) == Some("santa.txt") {
-                let content = std::fs::read_to_string(path)?;
+            if content.contains("COOKIE") {
+                let author = commit.author().name().unwrap().to_string();
+                let id = commit.id();
 
-                if content.contains("COOKIE") {
-                    let author = commit.author().name().unwrap().to_string();
-                    let id = commit.id();
-
-                    return Ok(HttpResponse::Ok().body(format!("{author} {id}")));
-                }
+                return Ok(HttpResponse::Ok().body(format!("{author} {id}")));
             }
         }
-
-        current_commit = commit.parent(0).ok();
     }
 
     Ok(HttpResponse::BadRequest().finish())
