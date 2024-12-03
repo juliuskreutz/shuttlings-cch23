@@ -20,7 +20,7 @@ type ShuttleResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[shuttle_runtime::main]
 async fn main(
-    #[shuttle_shared_db::Postgres(local_uri = "postgresql:///shuttle")] pool: PgPool,
+    #[shuttle_shared_db::Postgres] pool: PgPool,
 ) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
     let config = move |cfg: &mut ServiceConfig| {
         cfg.configure(day00::configure)
