@@ -688,39 +688,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cch23-julius"
-version = "0.1.0"
-dependencies = [
- "actix",
- "actix-files",
- "actix-multipart",
- "actix-web",
- "actix-ws",
- "anyhow",
- "base64 0.22.1",
- "chrono",
- "fancy-regex",
- "hex",
- "html-escape",
- "image",
- "lazy_static",
- "ordered-float",
- "reqwest 0.12.9",
- "serde",
- "serde_json",
- "sha2",
- "shuttle-actix-web",
- "shuttle-runtime",
- "shuttle-shared-db",
- "sqlx",
- "tokio",
- "tracing",
- "ulid",
- "unic-emoji-char",
- "uuid",
-]
-
-[[package]]
 name = "cfg-expr"
 version = "0.15.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3398,6 +3365,39 @@ dependencies = [
  "serde_json",
  "shuttle-service",
  "sqlx",
+]
+
+[[package]]
+name = "shuttlings-cch23"
+version = "0.1.0"
+dependencies = [
+ "actix",
+ "actix-files",
+ "actix-multipart",
+ "actix-web",
+ "actix-ws",
+ "anyhow",
+ "base64 0.22.1",
+ "chrono",
+ "fancy-regex",
+ "hex",
+ "html-escape",
+ "image",
+ "lazy_static",
+ "ordered-float",
+ "reqwest 0.12.9",
+ "serde",
+ "serde_json",
+ "sha2",
+ "shuttle-actix-web",
+ "shuttle-runtime",
+ "shuttle-shared-db",
+ "sqlx",
+ "tokio",
+ "tracing",
+ "ulid",
+ "unic-emoji-char",
+ "uuid",
 ]
 
 [[package]]

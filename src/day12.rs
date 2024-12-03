@@ -1,10 +1,6 @@
 use std::{collections::HashMap, time::Instant};
 
-use actix_web::{
-    get, post,
-    web::{self, Data, ServiceConfig},
-    HttpResponse, Responder,
-};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use chrono::{DateTime, Datelike, Utc};
 use tokio::sync::Mutex;
 use ulid::{serde::ulid_as_uuid, Ulid};
@@ -12,23 +8,25 @@ use ulid::{serde::ulid_as_uuid, Ulid};
 use crate::ShuttleResult;
 
 lazy_static::lazy_static!(
-    static ref MAP: Data<Mutex<HashMap<String, Instant>>> = Data::new(Mutex::new(HashMap::new()));
+    static ref STATE: web::Data<State> = web::Data::default();
 );
 
-pub fn configure(cfg: &mut ServiceConfig) {
+#[derive(Default)]
+struct State {
+    map: Mutex<HashMap<String, Instant>>,
+}
+
+pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(save)
         .service(load)
         .service(ulids)
         .service(ulids_weekday)
-        .app_data(MAP.clone());
+        .app_data(STATE.clone());
 }
 
 #[post("/12/save/{s}")]
-async fn save(
-    path: web::Path<String>,
-    data: web::Data<Mutex<HashMap<String, Instant>>>,
-) -> impl Responder {
-    let mut data = data.lock().await;
+async fn save(path: web::Path<String>, state: web::Data<State>) -> impl Responder {
+    let mut data = state.map.lock().await;
 
     data.insert(path.into_inner(), Instant::now());
 
@@ -36,11 +34,8 @@ async fn save(
 }
 
 #[get("/12/load/{s}")]
-async fn load(
-    path: web::Path<String>,
-    data: web::Data<Mutex<HashMap<String, Instant>>>,
-) -> impl Responder {
-    let data = data.lock().await;
+async fn load(path: web::Path<String>, state: web::Data<State>) -> impl Responder {
+    let data = state.map.lock().await;
 
     data[&path.into_inner()].elapsed().as_secs().to_string()
 }
