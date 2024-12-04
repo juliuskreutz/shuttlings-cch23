@@ -17,6 +17,32 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
+
+        shuttle = pkgs.rustPlatform.buildRustPackage rec {
+          pname = "cargo-shuttle";
+          version = "0.49.0";
+
+          doCheck = false;
+
+          src = pkgs.fetchCrate {
+            inherit pname version;
+            hash = "sha256-yRIRu0F4BiM/KfKTwty+uzH4uvhbiYd+XxzAQoxyb6o=";
+          };
+
+          cargoHash = "sha256-8F8iUprhSFB3LZBEl5XNObvhc301/akGpP/nI9YFZ+4=";
+        };
+
+        cch23-validator = pkgs.rustPlatform.buildRustPackage rec {
+          pname = "cch23-validator";
+          version = "22.0.2";
+
+          src = pkgs.fetchCrate {
+            inherit pname version;
+            hash = "sha256-x+UgW2ExmPuyG8htyby7LtvOtF2zpGeS2k/CmQiJbJo=";
+          };
+
+          cargoHash = "sha256-C43X9wxnwnupgPTNqBoApeVj0ZsjNFv1XNA779otBws=";
+        };
       in {
         devShells.default = with pkgs;
           mkShell {
@@ -27,6 +53,8 @@
               pkg-config
               openssl
               sqlx-cli
+              shuttle
+              cch23-validator
             ];
           };
       }
