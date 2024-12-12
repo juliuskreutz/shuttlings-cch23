@@ -113,22 +113,20 @@ async fn ws_room(
                         *state.counter.lock().await += 1;
                     }
                 }
-                Message::Close(_) => {
-                    state
-                        .rooms
-                        .lock()
-                        .await
-                        .get_mut(&room)
-                        .unwrap()
-                        .remove(&user);
-
-                    let _ = session.close(None).await;
-
-                    break;
-                }
+                Message::Close(_) => break,
                 _ => {}
             }
         }
+
+        state
+            .rooms
+            .lock()
+            .await
+            .get_mut(&room)
+            .unwrap()
+            .remove(&user);
+
+        let _ = session.close(None).await;
     });
 
     Ok(response)
