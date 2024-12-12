@@ -5,15 +5,17 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {
-    nixpkgs,
-    rust-overlay,
-    flake-utils,
-    ...
-  }:
+  outputs =
+    {
+      nixpkgs,
+      rust-overlay,
+      flake-utils,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (
-      system: let
-        overlays = [(import rust-overlay)];
+      system:
+      let
+        overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
           inherit system overlays;
         };
@@ -34,17 +36,19 @@
 
         cch23-validator = pkgs.rustPlatform.buildRustPackage rec {
           pname = "cch23-validator";
-          version = "22.0.2";
+          version = "22.0.5";
 
           src = pkgs.fetchCrate {
             inherit pname version;
-            hash = "sha256-x+UgW2ExmPuyG8htyby7LtvOtF2zpGeS2k/CmQiJbJo=";
+            hash = "sha256-U3APpUF5R18feZ+/alpDuhWbqIrCYBOuctY4HdE8TCw=";
           };
 
-          cargoHash = "sha256-C43X9wxnwnupgPTNqBoApeVj0ZsjNFv1XNA779otBws=";
+          cargoHash = "sha256-DbIGNaLr+Xi+AVVVW2bgfHGmFXhRIxM/6EH8XQSCkUU=";
         };
-      in {
-        devShells.default = with pkgs;
+      in
+      {
+        devShells.default =
+          with pkgs;
           mkShell {
             buildInputs = [
               rust-bin.stable.latest.default

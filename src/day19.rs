@@ -54,6 +54,7 @@ async fn ws_ping(req: HttpRequest, body: web::Payload) -> ShuttleResult<impl Res
 #[post("/19/reset")]
 async fn reset(state: web::Data<State>) -> impl Responder {
     *state.counter.lock().await = 0;
+    state.rooms.lock().await.clear();
 
     HttpResponse::Ok()
 }
@@ -95,14 +96,10 @@ async fn ws_room(
                         continue;
                     }
 
-                    for session in state
-                        .rooms
-                        .lock()
-                        .await
-                        .get_mut(&room)
-                        .unwrap()
-                        .values_mut()
-                    {
+                    let mut rooms = state.rooms.lock().await;
+                    let sessions = rooms.get_mut(&room).unwrap();
+
+                    for session in sessions.values_mut() {
                         session
                             .text(
                                 serde_json::to_string(
