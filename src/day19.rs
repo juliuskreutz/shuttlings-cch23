@@ -101,7 +101,7 @@ async fn ws_room(
                     let sessions = rooms.get_mut(&room).unwrap();
 
                     for session in sessions.values_mut() {
-                        session
+                        if session
                             .text(
                                 serde_json::to_string(
                                     &serde_json::json!({"user": user, "message": message}),
@@ -109,9 +109,10 @@ async fn ws_room(
                                 .unwrap(),
                             )
                             .await
-                            .unwrap();
-
-                        *state.counter.lock().await += 1;
+                            .is_ok()
+                        {
+                            *state.counter.lock().await += 1;
+                        }
                     }
                 }
                 Message::Close(_) => break,
