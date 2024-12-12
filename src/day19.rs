@@ -97,6 +97,7 @@ async fn ws_room(
                     }
 
                     let mut rooms = state.rooms.lock().await;
+
                     let sessions = rooms.get_mut(&room).unwrap();
 
                     for session in sessions.values_mut() {
